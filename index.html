@@ -226,7 +226,7 @@
             <div style="font-size: 0.7rem; opacity: 0.7;">
                 <i class="fas fa-shield-alt"></i> Files saved directly to your Google Drive
             </div>
-            <button class="drive-btn" id="openDriveBtn" onclick="window.open('https://drive.google.com/drive/folders/1gKYi9EvdvI48WtmRW8Hkn63Au-wH6KdP', '_blank')">
+            <button class="drive-btn" id="openDriveBtn" onclick="window.open('https://drive.google.com/drive/folders/1IOH-Fm6_jSuGuBeaCH53btv5orsKPQn6', '_blank')">
                 <i class="fab fa-google-drive"></i> Open Drive Folder
             </button>
         </div>
@@ -287,12 +287,11 @@
     let currentScore = null;
     let strengthChart = null;
 
-    // YOUR GOOGLE DRIVE FOLDER LINK
-    const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1gKYi9EvdvI48WtmRW8Hkn63Au-wH6KdP";
+    // UPDATED GOOGLE DRIVE FOLDER LINK
+    const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1IOH-Fm6_jSuGuBeaCH53btv5orsKPQn6";
     
-    // Simple Google Apps Script to receive files (minimal working version)
-    // This script accepts base64 file uploads and saves to your Drive
-    // Deploy this script at script.google.com and replace the URL below
+    // Google Apps Script URL (you'll need to deploy this)
+    // IMPORTANT: Replace this URL with your deployed Apps Script URL
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGdRx4BIctR43UgQAYjfKtn9KrEQXE-vwcyCGLiGgl2BLLeoyJH7-bWRqOtxaeq_SPfA/exec";
 
     function updateStep(stepIndex, status) {
@@ -474,7 +473,7 @@ Instructions:
 
 ----------------- COPY THIS TO APPS SCRIPT -----------------
 
-const FOLDER_ID = "1gKYi9EvdvI48WtmRW8Hkn63Au-wH6KdP";
+const FOLDER_ID = "1IOH-Fm6_jSuGuBeaCH53btv5orsKPQn6";
 
 function doPost(e) {
   try {
@@ -500,7 +499,7 @@ function doPost(e) {
 }
 
 function doGet() {
-  return ContentService.createTextOutput("AURA Uploader is running");
+  return ContentService.createTextOutput("AURA Uploader is running. Folder ID: " + FOLDER_ID);
 }
 
 ----------------- END OF APPS SCRIPT -----------------
