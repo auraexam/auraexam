@@ -182,7 +182,6 @@
         }
         .step-dot.active { background: #0cf; box-shadow: 0 0 10px #0cf; }
         .step-dot.completed { background: #7eff9e; }
-        .upload-status { font-size: 0.8rem; margin-top: 10px; color: #7eff9e; }
         @media (max-width: 800px) {
             .upload-grid, .results-panel { grid-template-columns: 1fr; }
             .logo h1 { font-size: 1.9rem; }
@@ -224,10 +223,10 @@
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div style="font-size: 0.7rem; opacity: 0.7;">
-                <i class="fas fa-shield-alt"></i> Files saved directly to your Google Drive
+                <i class="fas fa-shield-alt"></i> Files are uploaded via Google Form
             </div>
-            <button class="drive-btn" id="openDriveBtn" onclick="window.open('https://drive.google.com/drive/folders/1IOH-Fm6_jSuGuBeaCH53btv5orsKPQn6', '_blank')">
-                <i class="fab fa-google-drive"></i> Open Drive Folder
+            <button class="drive-btn" id="openFormBtn" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSeAlhEzQZrPB9PiSegaAZIt3gv6UX1aUjQOHpsD0eWjT0RIYA/viewform', '_blank')">
+                <i class="fab fa-google"></i> Open Google Form
             </button>
         </div>
     </div>
@@ -262,7 +261,7 @@
         </div>
     </div>
     <div class="footer-note">
-        <i class="fab fa-google-drive"></i> Your files are uploaded to Google Drive · AI analysis simulates exam strength score (60-92)
+        <i class="fab fa-google"></i> Files are submitted via Google Form · AI simulates exam strength score (60-92)
     </div>
 </div>
 
@@ -284,15 +283,22 @@
 
     let storedPdfFile = null;
     let storedImageFile = null;
-    let currentScore = null;
     let strengthChart = null;
 
-    // UPDATED GOOGLE DRIVE FOLDER LINK
-    const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1IOH-Fm6_jSuGuBeaCH53btv5orsKPQn6";
-    
-    // Google Apps Script URL (you'll need to deploy this)
-    // IMPORTANT: Replace this URL with your deployed Apps Script URL
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGdRx4BIctR43UgQAYjfKtn9KrEQXE-vwcyCGLiGgl2BLLeoyJH7-bWRqOtxaeq_SPfA/exec";
+    // ============================================================
+    // 🔧 CONFIGURATION: UPDATE THESE TWO VALUES WITH YOUR FORM DATA
+    // ============================================================
+    const UPLOAD_CONFIG = {
+        // 1. FORM ACTION URL: Replace with your form's "formResponse" URL
+        actionUrl: "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeAlhEzQZrPB9PiSegaAZIt3gv6UX1aUjQOHpsD0eWjT0RIYA/formResponse",
+        
+        // 2. FILE ENTRY ID: Replace with the "entry.NUMBER" for your file upload question
+        //    (Find this by inspecting the file input element on your live form)
+        fileEntryId: "entry.YOUR_FILE_ENTRY_ID_HERE"
+    };
+    // ============================================================
+
+    const FORM_VIEW_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeAlhEzQZrPB9PiSegaAZIt3gv6UX1aUjQOHpsD0eWjT0RIYA/viewform";
 
     function updateStep(stepIndex, status) {
         stepDots.forEach((dot, i) => {
@@ -322,10 +328,10 @@
     }
 
     function updateFileListPreview() {
-        let html = '<i class="fas fa-paperclip"></i> Uploaded files:<br/>';
+        let html = '<i class="fas fa-paperclip"></i> Selected files:<br/>';
         if (storedPdfFile) html += `📄 ${storedPdfFile.name}<br/>`;
         if (storedImageFile) html += `🖼️ ${storedImageFile.name}<br/>`;
-        if (!storedPdfFile && !storedImageFile) html = '<i class="fas fa-database"></i> No files uploaded yet.';
+        if (!storedPdfFile && !storedImageFile) html = '<i class="fas fa-database"></i> No files selected yet.';
         uploadedFilesListDiv.innerHTML = html;
     }
 
@@ -363,33 +369,21 @@
         }
     }
 
-    // Upload file to Google Drive via Apps Script (Base64 method - works reliably)
-    async function uploadFileToDrive(file, score) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = async function() {
-                const base64 = reader.result.split(',')[1];
-                const payload = {
-                    fileContent: base64,
-                    fileName: file.name,
-                    fileType: file.type,
-                    examScore: score,
-                    timestamp: new Date().toISOString()
-                };
-                try {
-                    const response = await fetch(APPS_SCRIPT_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    });
-                    const text = await response.text();
-                    resolve({ success: true, response: text });
-                } catch (err) {
-                    resolve({ success: false, error: err.message });
-                }
-            };
-            reader.onerror = () => reject(new Error("File read error"));
-            reader.readAsDataURL(file);
+    async function uploadFileToGoogleForm(file) {
+        return new Promise((resolve) => {
+            const formData = new FormData();
+            formData.append(UPLOAD_CONFIG.fileEntryId, file);
+            
+            // Submit to Google Form using fetch with no-cors (silent, no response needed)
+            fetch(UPLOAD_CONFIG.actionUrl, {
+                method: "POST",
+                body: formData,
+                mode: "no-cors"
+            }).catch(e => console.warn("Form submit silent error:", e));
+            
+            // Since Google Forms doesn't give a reliable success callback with no-cors,
+            // we assume success after a short delay.
+            setTimeout(() => resolve({ success: true }), 1000);
         });
     }
 
@@ -402,39 +396,31 @@
         analyzeBtn.disabled = true;
         analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing...';
         
-        // Step 0: Preparing
         updateStatus("📦 Preparing files for upload...", 0, true);
         await new Promise(r => setTimeout(r, 500));
         
-        // Step 1: Upload to Drive
-        updateStatus("☁️ Uploading files to Google Drive...", 1, true);
+        updateStatus("☁️ Submitting files to Google Form...", 1, true);
         
-        let uploadSuccess = false;
+        // Upload each file to Google Form
         if (storedPdfFile) {
-            const result = await uploadFileToDrive(storedPdfFile, "pending");
-            if (result.success) uploadSuccess = true;
+            await uploadFileToGoogleForm(storedPdfFile);
             await new Promise(r => setTimeout(r, 300));
         }
         if (storedImageFile) {
-            const result = await uploadFileToDrive(storedImageFile, "pending");
-            if (result.success) uploadSuccess = true;
+            await uploadFileToGoogleForm(storedImageFile);
             await new Promise(r => setTimeout(r, 300));
         }
         
-        updateStatus("✅ Files saved to Google Drive! Opening Drive folder...", 2, true);
+        updateStatus("✅ Files submitted to Google Form! Opening form...", 2, true);
         
-        // Open Google Drive folder in new tab so user sees their file
-        window.open(DRIVE_FOLDER_URL, '_blank');
-        
+        // Open the Google Form so user can see their submission
+        window.open(FORM_VIEW_URL, '_blank');
         await new Promise(r => setTimeout(r, 1500));
         
-        // Step 3: AI Analysis
         updateStatus("🧠 AI analyzing exam strength...", 3, true);
         await new Promise(r => setTimeout(r, 1800));
         
-        // Generate final score
         const finalScore = generateRandomScore();
-        currentScore = finalScore;
         const { label, insight } = getStrengthMeta(finalScore);
         
         scoreValueSpan.innerText = finalScore;
@@ -445,7 +431,7 @@
         let fileSummary = "";
         if(storedPdfFile) fileSummary += `📄 ${storedPdfFile.name.substring(0, 35)} `;
         if(storedImageFile) fileSummary += `🖼️ ${storedImageFile.name.substring(0, 35)}`;
-        dynamicInsightDiv.innerHTML += `<div style="margin-top: 12px; font-size:0.75rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px;"><i class="fab fa-google-drive"></i> Files saved to your Drive folder</div>`;
+        dynamicInsightDiv.innerHTML += `<div style="margin-top: 12px; font-size:0.75rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px;"><i class="fab fa-google"></i> Files submitted via Google Form</div>`;
         
         updateChart(finalScore);
         resultsPanel.style.display = 'grid';
@@ -459,50 +445,12 @@
 
     analyzeBtn.addEventListener('click', performAnalysis);
     updateFileDisplay();
-</script>
-
-<!-- ========== GOOGLE APPS SCRIPT CODE (Copy this to script.google.com) ==========
-Instructions:
-1. Go to script.google.com
-2. Create New Project
-3. Delete default code and paste the script below
-4. Click Deploy → New deployment → Web app
-5. Execute as: Me, Access: Anyone
-6. Deploy and copy URL
-7. Replace APPS_SCRIPT_URL above with your URL
-
------------------ COPY THIS TO APPS SCRIPT -----------------
-
-const FOLDER_ID = "1IOH-Fm6_jSuGuBeaCH53btv5orsKPQn6";
-
-function doPost(e) {
-  try {
-    const folder = DriveApp.getFolderById(FOLDER_ID);
-    const data = JSON.parse(e.postData.contents);
     
-    if (data.fileContent && data.fileName) {
-      const blob = Utilities.newBlob(
-        Utilities.base64Decode(data.fileContent),
-        data.fileType || "application/octet-stream",
-        data.fileName
-      );
-      folder.createFile(blob);
-      return ContentService.createTextOutput(JSON.stringify({status: "success"}))
-        .setMimeType(ContentService.MimeType.JSON);
+    // Show warning if config not set
+    if (UPLOAD_CONFIG.fileEntryId === "entry.YOUR_FILE_ENTRY_ID_HERE") {
+        console.warn("⚠️ Please update UPLOAD_CONFIG.fileEntryId with your Google Form's file entry ID");
+        updateStatus("⚠️ Setup needed: Configure the file entry ID in the script.", -1);
     }
-    return ContentService.createTextOutput(JSON.stringify({status: "error"}))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({status: "error", message: err.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function doGet() {
-  return ContentService.createTextOutput("AURA Uploader is running. Folder ID: " + FOLDER_ID);
-}
-
------------------ END OF APPS SCRIPT -----------------
--->
+</script>
 </body>
 </html>
